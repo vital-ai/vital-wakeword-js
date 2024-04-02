@@ -1,0 +1,38 @@
+{
+    "name": "@vital-ai/vital-wakeword-js",
+    "version": "0.1.0",
+    "description": "Vital Wakeword JS",
+    "author": "Marc Hadfield",
+    "keywords": [
+        "wake-word-detection",
+        "hotword"
+    ],
+    "main": "src/vitalwakeword.js",
+    "browser": "dist/vitalWakeWord.min.js",
+    "scripts": {
+        "build": "parcel build src/vitalwakeword.js --log-level 4 --no-cache --no-source-maps --detailed-report --out-file dist/vitalWakeWord.min.js",
+        "test": "parcel tests/with-bundler/index.html --out-dir dev-build --log-level 4 --no-cache"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/vital-ai/vital-wakeword-js.git"
+    },
+    "license": "",
+    "bugs": {
+        "url": "https://github.com/vital-ai/vital-wakeword-js/issues"
+    },
+    "homepage": "https://github.com/vital-ai/vital-wakeword-js",
+    "devDependencies": {
+        "@tensorflow/tfjs": "^3.21.0",
+        "@tensorflow/tfjs-backend-cpu": "^3.21.0",
+        "@tensorflow/tfjs-backend-wasm": "^3.21.0",
+        "@tensorflow/tfjs-backend-webgl": "^3.21.0",
+        "parcel-bundler": "^1.12.5",
+        "parcel-plugin-tensorflowjs-blob": "^1.0.0",
+        "parcel-plugin-wasm-blob": "^1.0.0",
+        "parcel-plugin-worker-blob": "^1.0.0"
+    },
+    "browserslist": [
+        "since 2017-06"
+    ]
+}
