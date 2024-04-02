@@ -21,26 +21,6 @@ export default class WakeWord extends Node {
         
     }
 
-    debounceTimer;
-    
-    playSound() {
-        const audio = new Audio('/sounds/dingsound.mp3');
-        audio.play();
-    }
-    
-    handleEvent(event, threshold = 0.2, debounceTime = 1000){
-        
-        if (this.debounceTimer) return;
-  
-        if (event.score > threshold) {
-            this.playSound();
-            this.debounceTimer = setTimeout(() => {
-                clearTimeout(this.debounceTimer);
-                this.debounceTimer = null;
-            }, debounceTime);
-        }
-    }
-    
     async start(node){
         await super.start(node)
         this.workerRuntime.postMessage({
@@ -56,8 +36,11 @@ export default class WakeWord extends Node {
                 let score = e.data.score;
                 
                 console.log('Wake Word Score:', score);
-                
-                _this.handleEvent({ score: score });
+
+                const event = new CustomEvent('wakeWordEvent', 
+                                { detail: score });
+
+                window.dispatchEvent(event);
                 
             }               
         }        

@@ -110,6 +110,34 @@ window.showLink = function (recInstance) {
     document.body.appendChild(hr)
 }
 
+let debounceTimer;
+    
+function playSound() {
+    const audio = new Audio('/sounds/dingsound.mp3');
+    audio.play();
+}
+    
+function handleEvent(event, threshold = 0.2, debounceTime = 1000){
+        
+    let score = event.detail;
+    
+    console.log('Hey Haley Score: ', score);
+    
+    if (debounceTimer) return;
+  
+    if (score > threshold) {
+        playSound();
+        debounceTimer = setTimeout(() => {
+            clearTimeout(debounceTimer);
+            debounceTimer = null;
+        }, debounceTime);
+    }
+}
+
+
+window.addEventListener('wakeWordEvent', handleEvent);
+
+
 // HTML Interface
 document.getElementById('mic').value = JSON.stringify(vitalWakeWord.Mic.defaultOptions, false, 4)
 
