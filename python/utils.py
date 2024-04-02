@@ -51,8 +51,6 @@ class AudioFeatures:
     async def init(self):
         get_embeddings = await self._get_embeddings(np.random.randint(-1000, 1000, 16000*4).astype(np.int16))
         get_embeddings = np.array(get_embeddings)
-        # js.console.log('init feature embeddings: ' + str(get_embeddings))
-        # js.console.log('init feature embeddings shape: ' + str(get_embeddings.shape))
         self.feature_buffer = get_embeddings
         
     async def reset(self):
@@ -84,27 +82,15 @@ class AudioFeatures:
                              f"You provided {x.dtype} data.")
         x = x[None, ] if len(x.shape) < 2 else x
         x = x.astype(np.float32) if x.dtype != np.float32 else x
-
-        # Get melspectrogram
         
         melspecModelPredict = js.melspecModelPredict
-
-        # outputs = self.melspec_model_predict(x)
-        
-        # js.console.log('melspec input shape: ' + str(x.shape))
         
         js_outputs = await melspecModelPredict(x.flatten())
         
-        # js.console.log("js_outputs", js_outputs)
-
         outputs = np.array(js_outputs.to_py())
 
         outputs = outputs.reshape(-1, 32)
-
-        # js.console.log("outputs", len(outputs))
         
-        # spec = np.squeeze(outputs[0])
-
         spec = np.squeeze(outputs)
 
         # Arbitrary transform of melspectrogram
@@ -115,39 +101,26 @@ class AudioFeatures:
     async def _get_embeddings(self, x: np.ndarray, window_size: int = 76, step_size: int = 8):
         """Function to compute the embeddings of the provide audio samples."""
         spec = await self._get_melspectrogram(x)
-        
-        # js.console.log("get embedding spec: " + str(spec))
-
-        # js.console.log("get embedding spec shape: " + str(spec.shape))
-        
+                
         windows = []
+        
         for i in range(0, spec.shape[0], 8):
             window = spec[i:i+window_size]
             if window.shape[0] == window_size:  # truncate short windows
                 windows.append(window)
 
         batch = np.expand_dims(np.array(windows), axis=-1).astype(np.float32)
-        
-        # js.console.log("get embedding input: " + str(batch.shape))
-
-        # js.console.log("get embedding input: " + str(batch))
-                
+                        
         embeddingModelPredict = js.embeddingModelPredict
 
         batch_count = batch.shape[0]
         
-        # js.console.log("batch count: " + str(batch_count))
-
         embedding = (await embeddingModelPredict(batch_count, batch.flatten())).to_py()
         
         embedding = np.array(embedding)
         
         embedding = embedding.reshape(-1, 96)
         
-        # js.console.log("get embedding output: " + str(embedding))
-
-        # js.console.log("get embedding output shape: " + str(embedding.shape))
-
         return embedding
 
     async def _streaming_melspectrogram(self, n_samples):
@@ -160,22 +133,11 @@ class AudioFeatures:
         if len(self.raw_data_buffer) < 400:
             raise ValueError("The number of input frames must be at least 400 samples @ 16khz (25 ms)!")
 
-        # the 1760 appears to come from 1280 + 160*3
-
         melspec_input = list(self.raw_data_buffer)[-n_samples-160*3:]    
-            
-        # js.console.log('melspec input length: ' + str(len(melspec_input)))
-    
+                
         melspec = await self._get_melspectrogram(melspec_input) 
-        
-        # melspec = melspec.reshape(-1, 32)
-        
-        # js.console.log('melspec: ' + str(melspec))
-
+                
         self.melspectrogram_buffer = np.vstack((self.melspectrogram_buffer, melspec ))
-
-        # js.console.log('after vstack')
-
         
         if self.melspectrogram_buffer.shape[0] > self.melspectrogram_max_len:
             self.melspectrogram_buffer = self.melspectrogram_buffer[-self.melspectrogram_max_len:, :]
@@ -227,13 +189,6 @@ class AudioFeatures:
                     embed_prediction_js = await embeddingModelPredict(1, x.flatten())
                     embed_prediction = embed_prediction_js.to_py()
                     embed_prediction_array = np.array(embed_prediction)
-
-                    # js.console.log('embed prediction: ' + str(embed_prediction_array))
-                    
-                    # js.console.log('feature buffer: ' + str(self.feature_buffer))
-
-                    # js.console.log('feature buffer: ' + str(self.feature_buffer.shape))
-
                     
                     self.feature_buffer = np.vstack((self.feature_buffer, embed_prediction_array))
 

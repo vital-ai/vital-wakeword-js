@@ -21,7 +21,6 @@ export default class WakeWord extends Node {
         
     }
 
-    
     debounceTimer;
     
     playSound() {
@@ -60,9 +59,7 @@ export default class WakeWord extends Node {
                 
                 _this.handleEvent({ score: score });
                 
-            }
-                        
-        }
-        
+            }               
+        }        
     }
 }

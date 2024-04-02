@@ -1,4 +1,5 @@
 import Node from '../nodes/node.js'
+
 import {
     RNNOISE_SAMPLE_LENGTH,
     Rnnoise
